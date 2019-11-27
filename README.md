@@ -1,37 +1,90 @@
-# mybatis-plus
+<p align="center">
+  <a href="https://github.com/baomidou/mybatis-plus">
+   <img alt="Mybatis-Plus-Logo" src="https://raw.githubusercontent.com/baomidou/logo/master/mybatis-plus-logo-new-mini.png">
+  </a>
+</p>
 
-#### 介绍
-mybatis-plus源码
+<p align="center">
+  Born To Simplify Development
+</p>
 
-#### 软件架构
-软件架构说明
+<p align="center">
+  <a href="https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.baomidou%22%20AND%20a%3A%22mybatis-plus%22">
+    <img alt="maven" src="https://img.shields.io/maven-central/v/com.baomidou/mybatis-plus.svg?style=flat-square">
+  </a>
 
+  <a href="https://www.apache.org/licenses/LICENSE-2.0">
+    <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
+  </a>
 
-#### 安装教程
+  <a href="https://gitter.im/baomidou/mybatis-plus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
+    <img alt="Join the chat at https://gitter.im/baomidou/mybatis-plus" src="https://badges.gitter.im/baomidou/mybatis-plus.svg">
+  </a>
+</p>
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## What is MyBatis-Plus?
 
-#### 使用说明
+MyBatis-Plus is an powerful enhanced toolkit of MyBatis for simplify development. This toolkit provides some efficient, useful, out-of-the-box features for MyBatis, use it can effectively save your development time.
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## Links
 
-#### 参与贡献
+-   [Documentation](https://mybatis.plus)
+-   [Samples](https://github.com/baomidou/mybatis-plus-samples.git)
+-   [Showcase](https://github.com/baomidou/awosome-mybaits-plus)
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+## Features
 
+-   Fully compatible with MyBatis
+-   Auto configuration on startup
+-   Out-of-the-box interfaces for operate database
+-   Powerful and flexible where condition wrapper
+-   Multiple strategy to generate primary key
+-   Lambda-style API
+-   Almighty and highly customizable code generator
+-   Automatic paging operation
+-   SQL Inject defense
+-   Support active record
+-   Support pluggable custom interface
+-   Build-in many useful extensions
 
-#### 码云特技
+## Getting started
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5.  码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+-   Add MyBatis-Plus dependency
+    -   Maven:
+        ```xml
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+        ```
+    -   Gradle
+        ```groovy
+        compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.1.2'
+        ```
+-   Modify mapper file extends BaseMapper interface
+
+    ```java
+    public interface UserMapper extends BaseMapper<User> {
+
+    }
+    ```
+
+-   Use it
+    ```java
+    List<User> userList = userMapper.selectList(
+            new QueryWrapper<User>()
+                    .lambda()
+                    .ge(User::getAge, 18)
+    );
+    ```
+    MyBatis-Plus will execute the following SQL
+    ```sql
+    SELECT * FROM user WHERE age >= 18
+    ```
+
+> This showcase is just a small part of MyBatis-Plus features. If you want to learn more, please refer to the [documentation](https://mybatis.plus).
+
+## License
+
+MyBatis-Plus is under the Apache 2.0 license. See the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0) file for details.
