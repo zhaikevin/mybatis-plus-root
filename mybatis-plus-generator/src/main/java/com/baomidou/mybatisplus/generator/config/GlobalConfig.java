@@ -37,6 +37,21 @@ public class GlobalConfig {
     private String outputDir = "D://";
 
     /**
+     * entity 根目录
+     */
+    private String entityMvnPath = "src/main/java";
+
+    /**
+     * mapper 根目录
+     */
+    private String mapperMvnPath = "src/main/java";
+
+    /**
+     * xml 根目录
+     */
+    private String xmlMvnPath = "src/main/resources";
+
+    /**
      * 是否覆盖已有文件
      */
     private boolean fileOverride = false;

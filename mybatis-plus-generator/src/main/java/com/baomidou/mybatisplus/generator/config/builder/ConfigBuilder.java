@@ -20,7 +20,14 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
-import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.ConstVal;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.IDbQuery;
+import com.baomidou.mybatisplus.generator.config.INameConvert;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.TemplateConfig;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableFill;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
@@ -42,7 +49,6 @@ import java.util.Set;
 
 /**
  * 配置汇总 传递给文件生成工具
- *
  * @author YangHu, tangguo, hubin
  * @since 2016-08-30
  */
@@ -103,7 +109,6 @@ public class ConfigBuilder {
 
     /**
      * 在构造器中处理配置
-     *
      * @param packageConfig    包配置
      * @param dataSourceConfig 数据源配置
      * @param strategyConfig   表配置
@@ -126,20 +131,17 @@ public class ConfigBuilder {
         }
         // 包配置
         if (null == packageConfig) {
-            handlerPackage(this.template, this.globalConfig.getOutputDir(), new PackageConfig());
+            handlerPackage(this.template, this.globalConfig, new PackageConfig());
         } else {
-            handlerPackage(this.template, this.globalConfig.getOutputDir(), packageConfig);
+            handlerPackage(this.template, this.globalConfig, packageConfig);
         }
         this.dataSourceConfig = dataSourceConfig;
-        handlerDataSource(dataSourceConfig);
         // 策略配置
         if (null == strategyConfig) {
             this.strategyConfig = new StrategyConfig();
         } else {
             this.strategyConfig = strategyConfig;
         }
-        //SQLITE 数据库不支持注释获取
-        commentSupported = !dataSourceConfig.getDbType().equals(DbType.SQLITE);
 
         handlerStrategy(this.strategyConfig);
     }
@@ -148,7 +150,6 @@ public class ConfigBuilder {
 
     /**
      * 所有包配置信息
-     *
      * @return 包配置
      */
     public Map<String, String> getPackageInfo() {
@@ -158,7 +159,6 @@ public class ConfigBuilder {
 
     /**
      * 所有路径配置
-     *
      * @return 路径配置
      */
     public Map<String, String> getPathInfo() {
@@ -178,7 +178,6 @@ public class ConfigBuilder {
 
     /**
      * 获取超类定义
-     *
      * @return 完整超类名称
      */
     public String getSuperServiceClass() {
@@ -198,10 +197,16 @@ public class ConfigBuilder {
 
     /**
      * 表信息
-     *
      * @return 所有表信息
      */
     public List<TableInfo> getTableInfoList() {
+        if (CollectionUtils.isNotEmpty(tableInfoList)) {
+            return tableInfoList;
+        }
+        handlerDataSource(dataSourceConfig);
+        //SQLITE 数据库不支持注释获取
+        commentSupported = !dataSourceConfig.getDbType().equals(DbType.SQLITE);
+        tableInfoList = getTablesInfo(strategyConfig);
         return tableInfoList;
     }
 
@@ -213,7 +218,6 @@ public class ConfigBuilder {
 
     /**
      * 模板路径配置信息
-     *
      * @return 所以模板路径配置信息
      */
     public TemplateConfig getTemplate() {
@@ -224,12 +228,11 @@ public class ConfigBuilder {
 
     /**
      * 处理包配置
-     *
-     * @param template  TemplateConfig
-     * @param outputDir
-     * @param config    PackageConfig
+     * @param template     TemplateConfig
+     * @param globalConfig GlobalConfig
+     * @param config       PackageConfig
      */
-    private void handlerPackage(TemplateConfig template, String outputDir, PackageConfig config) {
+    private void handlerPackage(TemplateConfig template, GlobalConfig globalConfig, PackageConfig config) {
         // 包信息
         packageInfo = new HashMap<>(8);
         packageInfo.put(ConstVal.MODULE_NAME, config.getModuleName());
@@ -246,10 +249,11 @@ public class ConfigBuilder {
             pathInfo = configPathInfo;
         } else {
             // 生成路径信息
+            String outputDir = globalConfig.getOutputDir();
             pathInfo = new HashMap<>(6);
-            setPathInfo(pathInfo, template.getEntity(getGlobalConfig().isKotlin()), outputDir, ConstVal.ENTITY_PATH, ConstVal.ENTITY);
-            setPathInfo(pathInfo, template.getMapper(), outputDir, ConstVal.MAPPER_PATH, ConstVal.MAPPER);
-            setPathInfo(pathInfo, template.getXml(), outputDir, ConstVal.XML_PATH, ConstVal.XML);
+            setPathInfo(pathInfo, template.getEntity(getGlobalConfig().isKotlin()), joinPath(outputDir, globalConfig.getEntityMvnPath()), ConstVal.ENTITY_PATH, ConstVal.ENTITY);
+            setPathInfo(pathInfo, template.getMapper(), joinPath(outputDir, globalConfig.getMapperMvnPath()), ConstVal.MAPPER_PATH, ConstVal.MAPPER);
+            setPathInfo(pathInfo, template.getXml(), joinPath(outputDir, globalConfig.getXmlMvnPath()), ConstVal.XML_PATH, ConstVal.XML);
             setPathInfo(pathInfo, template.getService(), outputDir, ConstVal.SERVICE_PATH, ConstVal.SERVICE);
             setPathInfo(pathInfo, template.getServiceImpl(), outputDir, ConstVal.SERVICE_IMPL_PATH, ConstVal.SERVICE_IMPL);
             setPathInfo(pathInfo, template.getController(), outputDir, ConstVal.CONTROLLER_PATH, ConstVal.CONTROLLER);
@@ -264,7 +268,6 @@ public class ConfigBuilder {
 
     /**
      * 处理数据源配置
-     *
      * @param config DataSourceConfig
      */
     private void handlerDataSource(DataSourceConfig config) {
@@ -275,18 +278,15 @@ public class ConfigBuilder {
 
     /**
      * 处理数据库表 加载数据库表、列、注释相关数据集
-     *
      * @param config StrategyConfig
      */
     private void handlerStrategy(StrategyConfig config) {
         processTypes(config);
-        tableInfoList = getTablesInfo(config);
     }
 
 
     /**
      * 处理superClassName,IdClassType,IdStrategy配置
-     *
      * @param config 策略配置
      */
     private void processTypes(StrategyConfig config) {
@@ -312,7 +312,6 @@ public class ConfigBuilder {
 
     /**
      * 处理表对应的类名称
-     *
      * @param tableList 表名称
      * @param strategy  命名策略
      * @param config    策略配置项
@@ -368,7 +367,6 @@ public class ConfigBuilder {
 
     /**
      * 检测导入包
-     *
      * @param tableInfo ignore
      */
     private void checkImportPackages(TableInfo tableInfo) {
@@ -535,7 +533,6 @@ public class ConfigBuilder {
 
     /**
      * 表名匹配
-     *
      * @param setTableName 设置表名
      * @param dbTableName  数据库表单
      * @return ignore
@@ -547,7 +544,6 @@ public class ConfigBuilder {
 
     /**
      * 将字段信息与表信息关联
-     *
      * @param tableInfo 表信息
      * @param config    命名策略
      * @return ignore
@@ -665,7 +661,6 @@ public class ConfigBuilder {
 
     /**
      * 连接路径字符串
-     *
      * @param parentDir   路径常量字符串
      * @param packageName 包名
      * @return 连接后的路径
@@ -684,7 +679,6 @@ public class ConfigBuilder {
 
     /**
      * 连接父子包名
-     *
      * @param parent     父包名
      * @param subPackage 子包名
      * @return 连接后的包名
@@ -699,7 +693,6 @@ public class ConfigBuilder {
 
     /**
      * 处理字段名称
-     *
      * @return 根据策略返回处理后的名称
      */
     private String processName(String name, NamingStrategy strategy) {
@@ -709,7 +702,6 @@ public class ConfigBuilder {
 
     /**
      * 处理表/字段名称
-     *
      * @param name     ignore
      * @param strategy ignore
      * @param prefix   ignore
