@@ -4,12 +4,9 @@ import ${package.Entity}.${entity};
 import ${superMapperClassPackage};
 
 /**
- * <p>
- * ${table.comment!} Mapper 接口
- * </p>
- *
- * @author ${author}
- * @since ${date}
+ * @Description: ${table.comment!} Mapper 接口
+ * @Author: ${author}
+ * @Date: ${date}
  */
 <#if kotlin>
 interface ${table.mapperName} : ${superMapperClass}<${entity}>

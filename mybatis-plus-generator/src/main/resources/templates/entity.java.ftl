@@ -12,16 +12,15 @@ import lombok.Data;
 </#if>
 
 /**
-* @Description: ${table.comment!}
-* @Author: ${author}
-* @Date: ${date}
-*/
-
+ * @Description: ${table.comment!}
+ * @Author: ${author}
+ * @Date: ${date}
+ */
 <#if entityLombokModel>
 @Data
 </#if>
 <#if table.convert>
-@TableName("${table.name}")
+@TableName(value = "${table.name}")
 </#if>
 <#if swagger2>
 @ApiModel(value="${entity}对象", description="${table.comment!}")
@@ -30,8 +29,10 @@ import lombok.Data;
 public class ${entity} extends ${superEntityClass}<#if activeRecord><${entity}></#if> {
 <#elseif activeRecord>
 public class ${entity} extends Model<${entity}> {
-<#else>
+<#elseif entitySerialVersionUID>
 public class ${entity} implements Serializable {
+<#else>
+public class ${entity} {
 </#if>
 
 <#if entitySerialVersionUID>
@@ -70,7 +71,7 @@ public class ${entity} implements Serializable {
     @TableField(fill = FieldFill.${field.fill})
         </#if>
     <#elseif field.convert>
-    @TableField("${field.name}")
+    @TableField(value = "${field.name}")
     </#if>
     <#-- 乐观锁注解 -->
     <#if (versionFieldName!"") == field.name>

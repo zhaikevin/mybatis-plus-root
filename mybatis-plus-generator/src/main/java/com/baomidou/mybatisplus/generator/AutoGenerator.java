@@ -150,13 +150,15 @@ public class AutoGenerator {
                 // 乐观锁注解
                 tableInfo.setImportPackages(Version.class.getCanonicalName());
             }
-            boolean importSerializable = true;
+            boolean importSerializable = false;
             if (StringUtils.isNotEmpty(config.getSuperEntityClass())) {
                 // 父实体
                 tableInfo.setImportPackages(config.getSuperEntityClass());
-                importSerializable = false;
             }
             if (config.getGlobalConfig().isActiveRecord()) {
+                importSerializable = true;
+            }
+            if (config.getStrategyConfig().isEntitySerialVersionUID()) {
                 importSerializable = true;
             }
             if (importSerializable) {
