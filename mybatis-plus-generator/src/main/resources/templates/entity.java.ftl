@@ -47,11 +47,10 @@ public class ${entity} {
     <#if field.comment!?length gt 0>
         <#if swagger2>
     @ApiModelProperty(value = "${field.comment}")
-        <#else>
+        </#if>
     /**
      * ${field.comment}
      */
-        </#if>
     </#if>
     <#if field.keyFlag>
         <#-- 主键 -->
